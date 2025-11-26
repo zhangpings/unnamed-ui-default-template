@@ -1,5 +1,9 @@
 This is the [assistant-ui](https://github.com/Yonom/assistant-ui) starter project.
 
+## Leveraging ExternalStoreRuntime to connect to SmartVision API
+
+https://www.assistant-ui.com/docs/runtimes/custom/external-store
+
 ## Getting Started
 
 First, add your OpenAI API key to `.env.local` file:
