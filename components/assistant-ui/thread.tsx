@@ -19,6 +19,8 @@ import {
   ThreadPrimitive,
 } from "@assistant-ui/react";
 
+import { PromptSendButton, PromptInput } from "@/components/prompt-01";
+
 import type { FC } from "react";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
@@ -178,11 +180,12 @@ const Composer: FC = () => {
         <ComposerAttachments />
         <ComposerPrimitive.Input
           placeholder="Send a message..."
-          className="aui-composer-input mb-1 max-h-32 min-h-16 w-full resize-none bg-transparent px-3.5 pt-1.5 pb-3 text-base outline-none placeholder:text-muted-foreground focus:outline-primary"
           rows={1}
           autoFocus
           aria-label="Message input"
-        />
+        >
+          <PromptInput />
+        </ComposerPrimitive.Input>
         <ComposerAction />
       </ComposerPrimitive.Root>
     </div>
@@ -196,7 +199,7 @@ const ComposerAction: FC = () => {
 
       <ThreadPrimitive.If running={false}>
         <ComposerPrimitive.Send asChild>
-          <TooltipIconButton
+          {/* <TooltipIconButton
             tooltip="Send message"
             side="bottom"
             type="submit"
@@ -206,13 +209,14 @@ const ComposerAction: FC = () => {
             aria-label="Send message"
           >
             <ArrowUpIcon className="aui-composer-send-icon size-5" />
-          </TooltipIconButton>
+          </TooltipIconButton> */}
+          <PromptSendButton />
         </ComposerPrimitive.Send>
       </ThreadPrimitive.If>
 
       <ThreadPrimitive.If running>
         <ComposerPrimitive.Cancel asChild>
-          <Button
+          {/* <Button
             type="button"
             variant="default"
             size="icon"
@@ -220,7 +224,8 @@ const ComposerAction: FC = () => {
             aria-label="Stop generating"
           >
             <Square className="aui-composer-cancel-icon size-3.5 fill-white dark:fill-black" />
-          </Button>
+          </Button> */}
+          <PromptSendButton disabled={false} />
         </ComposerPrimitive.Cancel>
       </ThreadPrimitive.If>
     </div>
