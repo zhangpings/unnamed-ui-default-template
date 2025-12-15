@@ -6,7 +6,7 @@ import { FC, PropsWithChildren, useCallback, useMemo } from "react";
 
 import { createAssistantStream } from "assistant-stream";
 import { useSmartVisionThreadHistoryAdapter } from "./useSmartVisionThreadHistoryAdapter";
-import { SmartVisionFileAttachmentAdapter } from "@/runtime/SmartVisionFileAttachmentAdapter";
+import { smartVisionFileAttachmentAdapter } from "@/runtime/SmartVisionFileAttachmentAdapter";
 import { getConversationsList } from "@/runtime/smartvisionApi";
 
 export const useSmartVisionThreadListAdapter = (): RemoteThreadListAdapter => {
@@ -25,10 +25,12 @@ export const useSmartVisionThreadListAdapter = (): RemoteThreadListAdapter => {
        * ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
        * */
       const history = useSmartVisionThreadHistoryAdapter();
-      const attachments = useMemo(
-        () => new SmartVisionFileAttachmentAdapter(),
-        [],
-      );
+      /**
+       * ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️ 注意
+       * 这里的附件Adapter不起作用，因为这里还没有迁移到最新的实现
+       * ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+       * */
+      const attachments = useMemo(() => smartVisionFileAttachmentAdapter, []);
       const adapters = useMemo(
         () => ({
           history,

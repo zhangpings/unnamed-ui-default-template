@@ -17,7 +17,21 @@ export const convertSmartVisionMessages: useExternalMessageConverter.Callback<
   if (messages.type === "human") {
     return {
       role: "user" as const,
-      content: [{ type: "text" as const, text: String(messages.content) }],
+      content:
+        typeof messages.content === "string"
+          ? [{ type: "text" as const, text: String(messages.content) }]
+          : messages.content.map((d) => {
+              if (d.type === "text") {
+                return {
+                  type: "text",
+                  text: d.text,
+                };
+              }
+              return {
+                type: "text",
+                text: "",
+              };
+            }),
     };
   } else if (messages.type === "ai") {
     // 🎯 关键修复：正确处理包含 tool-call 的消息

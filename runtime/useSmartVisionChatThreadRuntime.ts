@@ -9,9 +9,10 @@ import { useSmartVisionMessages } from "./useSmartVisionMessages";
 import {
   convertSmartVisionMessages,
   getSmartVisionMessage,
-} from "@/runtime/convertSmartVisionMessages";
+} from "./convertSmartVisionMessages";
 import { SmartVisionMessage } from "@/runtime/types";
 import { useSmartVisionExternalHistory } from "./useSmartVisionExternalHistory";
+import { smartVisionFileAttachmentAdapter } from "./SmartVisionFileAttachmentAdapter";
 
 export const useSmartVisionChatThreadRuntime = () => {
   const [isRunning, setIsRunning] = useState(false);
@@ -63,20 +64,25 @@ export const useSmartVisionChatThreadRuntime = () => {
       const userMessage: SmartVisionMessage = {
         id: `user_${Date.now()}`,
         type: "human",
-        content:
-          typeof message.content === "string"
-            ? message.content
-            : message.content
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .map((c: any) => (c.type === "text" ? c.text : ""))
-                .join(""),
+        content: message.content.map((c) => {
+          if (c.type === "text") return { type: "text", text: c.text };
+          return { type: "text", text: "" };
+        }),
+        files: message.attachments?.map((d) => d.id),
       };
-
       await handleSendMessage([userMessage]);
     },
     onImport: (messages) =>
       setMessages(messages.map(getSmartVisionMessage).filter(Boolean).flat()),
     isLoading,
+    adapters: {
+      /**
+       * ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️ 注意
+       * 附件Adapter依然使用老的方式实现
+       * ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+       * */
+      attachments: smartVisionFileAttachmentAdapter,
+    },
   });
   return runtime;
 };
