@@ -89,6 +89,7 @@ export type SmartVisionMessage =
       type: "human";
       id: string;
       content: string | SmartVisionContentPart[];
+      files?: string[];
     }
   | {
       type: "ai";
@@ -227,4 +228,11 @@ export interface MessageProps {
   is_audio?: boolean;
   canvas_meta?: any;
   cotent?: string;
+}
+
+export interface FileUploadResponse {
+  id: string;
+  name: string;
+  url: string;
+  extension: string;
 }
