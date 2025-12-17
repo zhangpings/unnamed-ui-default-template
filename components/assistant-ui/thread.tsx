@@ -1,6 +1,5 @@
 import {
   ArrowDownIcon,
-  ArrowUpIcon,
   CheckIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -8,6 +7,8 @@ import {
   PencilIcon,
   RefreshCwIcon,
   Square,
+  Send,
+  PlusIcon,
 } from "lucide-react";
 
 import {
@@ -17,9 +18,9 @@ import {
   ErrorPrimitive,
   MessagePrimitive,
   ThreadPrimitive,
+  useAssistantState,
 } from "@assistant-ui/react";
-
-import { PromptSendButton, PromptInput } from "@/components/prompt-01";
+import { useShallow } from "zustand/shallow";
 
 import type { FC } from "react";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
@@ -30,10 +31,21 @@ import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { ToolFallback } from "@/components/assistant-ui/tool-fallback";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import {
-  ComposerAddAttachment,
   ComposerAttachments,
   UserMessageAttachments,
 } from "@/components/assistant-ui/attachment";
+import {
+  SenderContainer,
+  SenderTextarea,
+  SenderAttachmentButton,
+  SenderSendButton,
+  SenderRegion,
+  SenderActionBar,
+} from "@/components/wuhan/blocks/sender-01";
+import {
+  AIMessage as WuhanAIMessage,
+  UserMessage as WuhanUserMessage,
+} from "@/components/wuhan/blocks/message-01";
 
 import { cn } from "@/lib/utils";
 
@@ -172,22 +184,46 @@ const ThreadSuggestions: FC = () => {
   );
 };
 
+const ComposerAttachmentsRegion: FC = () => {
+  const hasAttachments = useAssistantState(
+    useShallow(({ composer }) => {
+      const attachments = composer.attachments;
+      return attachments && attachments.length > 0;
+    }),
+  );
+
+  if (!hasAttachments) return null;
+
+  return (
+    <SenderRegion className="py-0">
+      <ComposerAttachments />
+    </SenderRegion>
+  );
+};
+
 const Composer: FC = () => {
   return (
     <div className="aui-composer-wrapper sticky bottom-0 mx-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-4 overflow-visible rounded-t-3xl bg-background pb-4 md:pb-6">
       <ThreadScrollToBottom />
-      <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col rounded-3xl border border-border bg-muted px-1 pt-2 shadow-[0_9px_9px_0px_rgba(0,0,0,0.01),0_2px_5px_0px_rgba(0,0,0,0.06)] dark:border-muted-foreground/15">
-        <ComposerAttachments />
-        <ComposerPrimitive.Input
-          placeholder="Send a message..."
-          rows={1}
-          autoFocus
-          aria-label="Message input"
-          asChild
-        >
-          <PromptInput />
-        </ComposerPrimitive.Input>
-        <ComposerAction />
+      <ComposerPrimitive.Root asChild>
+        <SenderContainer className="aui-composer-root shadow-[0_9px_9px_0px_rgba(0,0,0,0.01),0_2px_5px_0px_rgba(0,0,0,0.06)] dark:border-muted-foreground/15">
+          <ComposerAttachmentsRegion />
+          <ComposerPrimitive.Input
+            placeholder="Send a message..."
+            rows={1}
+            autoFocus
+            aria-label="Message input"
+            asChild
+          >
+            <SenderTextarea />
+          </ComposerPrimitive.Input>
+          <SenderActionBar className="flex items-center justify-between">
+            <ComposerPrimitive.AddAttachment asChild>
+              <SenderAttachmentButton className="cursor-pointer" aria-label="Add Attachment"/>
+            </ComposerPrimitive.AddAttachment>
+            <ComposerAction />
+          </SenderActionBar>
+        </SenderContainer>
       </ComposerPrimitive.Root>
     </div>
   );
@@ -195,41 +231,23 @@ const Composer: FC = () => {
 
 const ComposerAction: FC = () => {
   return (
-    <div className="aui-composer-action-wrapper relative mx-1 mt-2 mb-2 flex items-center justify-between">
-      <ComposerAddAttachment />
-
+    <>
       <ThreadPrimitive.If running={false}>
         <ComposerPrimitive.Send asChild>
-          {/* <TooltipIconButton
-            tooltip="Send message"
-            side="bottom"
-            type="submit"
-            variant="default"
-            size="icon"
-            className="aui-composer-send size-[34px] rounded-full p-1"
-            aria-label="Send message"
-          >
-            <ArrowUpIcon className="aui-composer-send-icon size-5" />
-          </TooltipIconButton> */}
-          <PromptSendButton />
+          <SenderSendButton aria-label="Send message">
+            <Send className="size-4" />
+          </SenderSendButton>
         </ComposerPrimitive.Send>
       </ThreadPrimitive.If>
 
       <ThreadPrimitive.If running>
         <ComposerPrimitive.Cancel asChild>
-          {/* <Button
-            type="button"
-            variant="default"
-            size="icon"
-            className="aui-composer-cancel size-[34px] rounded-full border border-muted-foreground/60 hover:bg-primary/75 dark:border-muted-foreground/90"
-            aria-label="Stop generating"
-          >
-            <Square className="aui-composer-cancel-icon size-3.5 fill-white dark:fill-black" />
-          </Button> */}
-          <PromptSendButton disabled={false} />
+          <SenderSendButton generating aria-label="Stop generating">
+            <Square className="size-3.5 fill-white dark:fill-black" />
+          </SenderSendButton>
         </ComposerPrimitive.Cancel>
       </ThreadPrimitive.If>
-    </div>
+    </>
   );
 };
 
@@ -250,19 +268,26 @@ const AssistantMessage: FC = () => {
         className="aui-assistant-message-root relative mx-auto w-full max-w-[var(--thread-max-width)] animate-in py-4 duration-150 ease-out fade-in slide-in-from-bottom-1 last:mb-24"
         data-role="assistant"
       >
-        <div className="aui-assistant-message-content mx-2 leading-7 break-words text-foreground">
-          <MessagePrimitive.Parts
-            components={{
-              Text: MarkdownText,
-              tools: { Fallback: ToolFallback },
-            }}
-          />
-          <MessageError />
-        </div>
-
-        <div className="aui-assistant-message-footer mt-2 ml-2 flex">
-          <BranchPicker />
-          <AssistantActionBar />
+        <div className="mx-2">
+          <WuhanAIMessage
+            className="break-words"
+            feedback={
+              <div className="aui-assistant-message-footer mt-2 flex">
+                <BranchPicker />
+                <AssistantActionBar />
+              </div>
+            }
+          >
+            <div className="aui-assistant-message-content leading-7 break-words">
+              <MessagePrimitive.Parts
+                components={{
+                  Text: MarkdownText,
+                  tools: { Fallback: ToolFallback },
+                }}
+              />
+              <MessageError />
+            </div>
+          </WuhanAIMessage>
         </div>
       </div>
     </MessagePrimitive.Root>
@@ -306,10 +331,12 @@ const UserMessage: FC = () => {
         <UserMessageAttachments />
 
         <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
-          <div className="aui-user-message-content rounded-3xl bg-muted px-5 py-2.5 break-words text-foreground">
+          <WuhanUserMessage
+            className="aui-user-message-content break-words"
+          >
             <MessagePrimitive.Parts />
-          </div>
-          <div className="aui-user-action-bar-wrapper absolute top-1/2 left-0 -translate-x-full -translate-y-1/2 pr-2">
+          </WuhanUserMessage>
+          <div className="absolute top-full right-0 z-10 mt-2">
             <UserActionBar />
           </div>
         </div>
@@ -325,7 +352,7 @@ const UserActionBar: FC = () => {
     <ActionBarPrimitive.Root
       hideWhenRunning
       autohide="not-last"
-      className="aui-user-action-bar-root flex flex-col items-end"
+      className="aui-user-action-bar-root flex flex-col items-end text-muted-foreground"
     >
       <ActionBarPrimitive.Edit asChild>
         <TooltipIconButton tooltip="Edit" className="aui-user-action-edit p-4">

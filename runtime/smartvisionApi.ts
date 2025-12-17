@@ -44,10 +44,11 @@ export class SmartVisionClient {
     const headers = this.getHeaders();
 
     // 将 SmartVisionMessage 转换为 API 所需的格式
+    const allMessageContents = params.messages
+      .filter((d) => d.type === "human")
+      .map((d) => d.content);
     const query =
-      params.messages
-        .filter((d) => d.type === "human")
-        .map((d) => d.content)
+      allMessageContents
         .map((d) => {
           if (typeof d === "string") {
             return [d];
@@ -59,7 +60,9 @@ export class SmartVisionClient {
         .at(-1) || "";
     const files = params.messages
       .filter((d) => d.type === "human")
-      .map((d) => d.files)
+      .map((d) => {
+        return d.attachments?.map((d) => d.id) || [];
+      })
       .flat()
       .filter(Boolean);
     // 构造请求体（参考 smartversion 的格式）
