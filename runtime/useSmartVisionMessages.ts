@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { sendSmartVisionMessage } from "./smartvisionApi";
 import { findMessageById, generateUniqueId } from "./helpers";
 import { useAssistantApi } from "@assistant-ui/react";
+import { initializeThreadId } from "@/runtime/smartVisionThreadListAdapterLink";
 
 export const useSmartVisionMessages = () => {
   const api = useAssistantApi();
@@ -12,6 +13,7 @@ export const useSmartVisionMessages = () => {
     // 🆕 为 AI 回复创建专门的消息ID
     let aiResponseId: string | null = null; // 🆕 延迟初始化
     const remoteId = api.threadListItem().getState().remoteId;
+    const localId = api.threadListItem().getState().id;
     try {
       // 调用 SmartVision API
       const generator = sendSmartVisionMessage({
@@ -87,6 +89,9 @@ export const useSmartVisionMessages = () => {
           }
 
           console.log("💬 更新 AI 回复，ID:", aiResponseId);
+        }
+        if (chunk.conversation_id) {
+          initializeThreadId(localId, chunk.conversation_id);
         }
       }
     } catch (error) {
