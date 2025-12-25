@@ -6,6 +6,7 @@ import { ToolFallback } from "../tool-fallback";
 import { BranchPicker } from "./BranchPicker";
 import { AssistantActionBar } from "./AssistantActionBar";
 import { MessageError } from "./MessageError";
+import { AssistantActionBar } from "./AssistantActionBar";
 
 export const AssistantMessage: FC = () => {
   return (

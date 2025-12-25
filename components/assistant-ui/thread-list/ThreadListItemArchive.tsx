@@ -1,5 +1,6 @@
-import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
+import { ThreadListItemPrimitive } from "@assistant-ui/react";
 import { FC } from "react";
+import { TooltipIconButton } from "../tooltip-icon-button";
 import { ArchiveIcon } from "lucide-react";
 import { ThreadListItemPrimitive } from "@assistant-ui/react";
 

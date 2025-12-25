@@ -1,4 +1,5 @@
 import { ActionBarPrimitive } from "@assistant-ui/react";
+import { FC } from "react";
 import { TooltipIconButton } from "../tooltip-icon-button";
 import { PencilIcon } from "lucide-react";
 import { FC } from "react";

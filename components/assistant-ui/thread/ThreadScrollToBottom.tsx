@@ -1,3 +1,4 @@
+import { ThreadPrimitive } from "@assistant-ui/react";
 import type { FC } from "react";
 import { ThreadPrimitive, } from "@assistant-ui/react";
 

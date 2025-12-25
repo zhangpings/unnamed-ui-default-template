@@ -4,6 +4,9 @@ import {
 } from "@assistant-ui/react";
 import { Button } from "@/components/ui/button";
 import { m } from "motion/react";
+import { FC } from "react";
+import { Button } from "@/components/ui/button";
+import { ThreadPrimitive } from "@assistant-ui/react";
 
 
 export const ThreadSuggestions: FC = () => {
