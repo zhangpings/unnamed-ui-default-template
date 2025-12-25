@@ -13,8 +13,22 @@ interface SmartVisionChatReferenceLinkState {
 const store = create(immer<SmartVisionChatReferenceLinkState>(() => ({})));
 
 export const useSmartVisionChatReferenceLink = () => {
-  const chooseReference = async () => {};
-  const clearReference = async () => {};
+  const chooseReference = (
+    text: string,
+    position: { top: number; left: number },
+  ) => {
+    store.setState((draft) => {
+      draft.reference = {
+        text,
+        position,
+      };
+    });
+  };
+  const clearReference = () => {
+    store.setState((draft) => {
+      draft.reference = undefined;
+    });
+  };
   return {
     chooseReference,
     clearReference,

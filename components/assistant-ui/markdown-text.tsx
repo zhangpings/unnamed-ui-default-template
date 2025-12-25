@@ -14,51 +14,10 @@ import { CheckIcon, CopyIcon } from "lucide-react";
 
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { cn } from "@/lib/utils";
+import { useSmartVisionChatReferenceLink } from "@/runtime/smartVisionChatReferenceLink";
 
 const MarkdownTextImpl = () => {
-  const contentRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const contentNode = contentRef.current;
-    const handleMouseUp = () => {
-      const selection = window.getSelection();
-      const selectText = selection && selection?.toString(); // 获取当前选中的文本
 
-      if (
-        selectText &&
-        selectText.length > 0 &&
-        contentNode?.contains(selection.anchorNode)
-      ) {
-        // 定位
-        const range = selection.getRangeAt(0).getBoundingClientRect();
-        const componentRect = contentRef.current?.getBoundingClientRect() ?? {
-          top: 0,
-          left: 0,
-        };
-
-        const top = range.top - componentRect.top - 28; // 20px above the selected text
-        const left = range.left - componentRect.left;
-        setSelectedText(selectText);
-        setIconPosition({ top, left });
-        setShowIcon(true);
-      }
-    };
-    // 监听页面其余地方取消选中清空
-    const handleMouseDown = (event: any) => {
-      // 确保点击图标时不会隐藏图标
-      // @ts-ignore
-      if (iconRef.current && iconRef.current.contains(event.target)) {
-        return;
-      }
-      setShowIcon(false);
-    };
-
-    contentNode?.addEventListener("mouseup", handleMouseUp);
-    document.addEventListener("mousedown", handleMouseDown);
-    return () => {
-      contentNode?.removeEventListener("mouseup", handleMouseUp);
-      document.addEventListener("mousedown", handleMouseDown);
-    };
-  }, []);
 
   return (
     <MarkdownTextPrimitive
