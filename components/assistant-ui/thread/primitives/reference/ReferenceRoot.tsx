@@ -7,7 +7,7 @@ import {
 } from "react";
 import { Primitive } from "@radix-ui/react-primitive";
 import { useSmartVisionChatReferenceLink } from "@/runtime/smartVisionChatReferenceLink";
-
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
 type PrimitiveDivProps = ComponentPropsWithoutRef<typeof Primitive.div>;
 export type Element = ComponentRef<typeof Primitive.div>;
@@ -15,24 +15,17 @@ export type Props = PrimitiveDivProps & {};
 export const ReferencePrimitiveRoot = forwardRef<Element, Props>(
   (props, forwardedRef) => {
     const localRef = useRef<HTMLDivElement>(null);
+    const ref = useComposedRefs(forwardedRef, localRef);
     const { chooseReference, clearReference } =
       useSmartVisionChatReferenceLink();
 
-    // 合并 forwardedRef 和 internalRef
-    useEffect(() => {
-      if (typeof forwardedRef === "function") {
-        forwardedRef(localRef.current);
-      } else if (forwardedRef) {
-        forwardedRef.current = localRef.current;
-      }
-    }, [localRef.current]);
     useEffect(() => {
       const contentNode = localRef.current;
       const handleMouseUp = () => {
         const selection = window.getSelection();
-        const selectText = selection && selection?.toString(); // 获取当前选中的文本
-
+        const selectText = selection?.toString(); // 获取当前选中的文本
         if (
+          selection &&
           selectText &&
           selectText.length > 0 &&
           contentNode?.contains(selection.anchorNode)
@@ -47,22 +40,17 @@ export const ReferencePrimitiveRoot = forwardRef<Element, Props>(
           const top = range.top - componentRect.top - 28; // 20px above the selected text
           const left = range.left - componentRect.left;
           chooseReference(selectText, { top, left });
+        } else {
+          clearReference(false);
         }
       };
-      // 监听页面其余地方取消选中清空
-      const handleMouseDown = (event: any) => {
-        // 确保点击图标时不会隐藏图标
-        clearReference();
-      };
 
-      contentNode?.addEventListener("mouseup", handleMouseUp);
-      document.addEventListener("mousedown", handleMouseDown);
+      document.addEventListener("selectionchange", handleMouseUp);
       return () => {
-        contentNode?.removeEventListener("mouseup", handleMouseUp);
-        document.addEventListener("mousedown", handleMouseDown);
+        document.removeEventListener("selectionchange", handleMouseUp);
         clearReference();
       };
     }, []);
-    return <Primitive.div {...props} ref={localRef} />;
+    return <Primitive.div {...props} ref={ref} />;
   },
 );

@@ -5,9 +5,9 @@ import { useSmartVisionChatReferenceLink } from "@/runtime/smartVisionChatRefere
 type PrimitiveDivProps = ComponentPropsWithoutRef<typeof Primitive.button>;
 export type Element = ComponentRef<typeof Primitive.button>;
 export type Props = PrimitiveDivProps & {};
-export const ReferenceUse = forwardRef<Element, Props>(
+export const ReferencePrimitiveCancel = forwardRef<Element, Props>(
   ({ onClick, ...props }, ref) => {
-    const { useReference } = useSmartVisionChatReferenceLink();
+    const { clearReference } = useSmartVisionChatReferenceLink();
     return (
       <Primitive.button
         type="button"
@@ -15,7 +15,7 @@ export const ReferenceUse = forwardRef<Element, Props>(
         ref={ref}
         onClick={(e) => {
           onClick?.(e);
-          useReference();
+          clearReference();
         }}
       />
     );
